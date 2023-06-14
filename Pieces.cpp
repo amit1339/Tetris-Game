@@ -114,13 +114,13 @@ void Pieces::Rotate(Direction direction)
 void Pieces::Move(Direction direction)
 {
 
-    if (direction == LEFT)
+    if (m_position.x >= 10 && direction == LEFT)
     {
         SetPosition(-BlockSize, 0);
         m_position.x -= BlockSize;
     }
 
-    else if (direction == RIGHT)
+    else if (m_position.x <= 275 && direction == RIGHT)
     {
         SetPosition(BlockSize, 0);
         m_position.x += BlockSize;
@@ -141,27 +141,29 @@ sf::Vector2f Pieces::GetPosition()
 
 LPiece::LPiece():Pieces(sf::Color::White)
 {
+    sf::Vector2f pos = GetPosition();
+    sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
-        {new Block(0,0, GetColor()), nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), nullptr, nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {new Block(pos.x, pos.y, color), nullptr, nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color), nullptr, nullptr},
+        {new Block(pos.x, pos.y + 2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
         {nullptr, nullptr, nullptr},
-        {nullptr, nullptr, new Block(2 * BlockSize, BlockSize, GetColor())},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), new Block(2 * BlockSize, 2 *BlockSize, GetColor())},
+        {nullptr, nullptr, new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + 2 *BlockSize, color)},
     },
     {
-        {nullptr, new Block(BlockSize,0, GetColor()), new Block( 2 * BlockSize,0, GetColor())},
-        {nullptr, nullptr, new Block(2 * BlockSize, BlockSize, GetColor())},
-        {nullptr, nullptr, new Block(2 * BlockSize, 2 * BlockSize, GetColor())},
+        {nullptr, new Block(pos.x + BlockSize, pos.y, color), new Block( pos. x + 2 * BlockSize, pos.y, color)},
+        {nullptr, nullptr, new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {nullptr, nullptr, new Block( pos.x + 2 * BlockSize, pos.y + 2 * BlockSize, color)},
     },
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0,BlockSize, GetColor()), new Block(BlockSize,BlockSize, GetColor()), new Block(2 * BlockSize, BlockSize, GetColor())},
-        {new Block(0, 2* BlockSize, GetColor()), nullptr, nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {new Block(pos.x, pos.y + 2* BlockSize, color), nullptr, nullptr},
     }
 };
     SetShape(vector);
@@ -170,27 +172,29 @@ LPiece::LPiece():Pieces(sf::Color::White)
 
 JPiece::JPiece():Pieces(sf::Color::Magenta)
 {
+    sf::Vector2f pos = GetPosition();
+    sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
-        {nullptr, nullptr, new Block(2 * BlockSize,0, GetColor())},
-        {nullptr, nullptr, new Block(2 * BlockSize, BlockSize, GetColor())},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), new Block(2 * BlockSize, 2 * BlockSize, GetColor())}
+        {nullptr, nullptr, new Block(pos.x + 2 * BlockSize, pos.y, color)},
+        {nullptr, nullptr, new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block( pos.x + 2 * BlockSize, pos.y + 2 * BlockSize, color)}
     },
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()),  new Block(BlockSize, BlockSize, GetColor()),  new Block(2 * BlockSize, BlockSize, GetColor())},
-        {new Block(0, 2 * BlockSize, GetColor()),nullptr, nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color),  new Block(pos.x + BlockSize, pos.y + BlockSize, color),  new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {nullptr, nullptr, new Block(pos.x + 2 * BlockSize, pos.y +  2 * BlockSize, color)},
     },
     {
-        {nullptr, new Block(BlockSize,0, GetColor()), new Block( 2 * BlockSize,0, GetColor())},
-        {nullptr, nullptr, new Block(2 * BlockSize, BlockSize, GetColor())},
-        {nullptr, nullptr, new Block(2 * BlockSize, 2 * BlockSize, GetColor())},
+        {new Block(pos.x, pos.y, color), new Block(pos.x + BlockSize, pos.y , color), nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color), nullptr, nullptr},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), nullptr, nullptr},
     },
     {
-        {new Block(0,0, GetColor()), new Block(BlockSize,0, GetColor()), new Block(2 * BlockSize,0, GetColor())},
-        {new Block(0, BlockSize, GetColor()), nullptr, nullptr},
         {nullptr, nullptr, nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color), nullptr, nullptr},
+        {new Block(pos.x, pos.y + 2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + 2 * BlockSize, color)},
     }
 };
     
@@ -200,27 +204,29 @@ JPiece::JPiece():Pieces(sf::Color::Magenta)
 
 SPiece::SPiece():Pieces(sf::Color::Red)
 {
-std::vector<std::vector<std::vector<Block*>>> vector = 
+    sf::Vector2f pos = GetPosition();
+    sf::Color color = GetColor();
+    std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
         {nullptr, nullptr, nullptr},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), new Block(2 * BlockSize, BlockSize, GetColor())},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
-        {new Block(0, 0, GetColor()), nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr},
+        {new Block(pos.x , pos.y, color), nullptr, nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr},
     },
     {
         {nullptr, nullptr, nullptr},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), new Block(2 * BlockSize, BlockSize, GetColor())},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
-        {new Block(0, 0, GetColor()), nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr},
+        {new Block(pos.x , pos.y, color), nullptr, nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr},
     }
 };
     
@@ -231,27 +237,29 @@ std::vector<std::vector<std::vector<Block*>>> vector =
 
 ZPiece::ZPiece():Pieces(sf::Color::Green)
 {
-   std::vector<std::vector<std::vector<Block*>>> vector = 
+    sf::Vector2f pos = GetPosition();
+    sf::Color color = GetColor();
+    std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), new Block(2* BlockSize, 2 * BlockSize, GetColor())}
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block(pos.x + 2* BlockSize, pos.y + 2 * BlockSize, color)}
     },
     {
-        {nullptr, nullptr, new Block(2 * BlockSize, 0, GetColor())},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), new Block(2 * BlockSize, BlockSize, GetColor())},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr},
+        {nullptr, nullptr, new Block(pos.x + 2 * BlockSize, pos.y, color)},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr},
     },
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), new Block(2* BlockSize, 2 * BlockSize, GetColor())}
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block(pos.x + 2* BlockSize, pos.y + 2 * BlockSize, color)}
     },
     {
-        {nullptr, nullptr, new Block(2 * BlockSize, 0, GetColor())},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), new Block(2 * BlockSize, BlockSize, GetColor())},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr},
+        {nullptr, nullptr, new Block(pos.x + 2 * BlockSize, pos.y, color)},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr},
     }
 };
     
@@ -262,27 +270,29 @@ ZPiece::ZPiece():Pieces(sf::Color::Green)
 
 IPiece::IPiece():Pieces(sf::Color::Blue)
 {
+    sf::Vector2f pos = GetPosition();
+    sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
-        {nullptr, new Block(BlockSize, 0, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {nullptr, new Block(pos.x + BlockSize, pos.y, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
         {nullptr, nullptr, nullptr},
         {nullptr, nullptr, nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), new Block(2 * BlockSize, 2 *BlockSize, GetColor())},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + 2 *BlockSize, color)},
     },
     {
-        {nullptr, new Block(BlockSize, 0, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {nullptr, new Block(pos.x + BlockSize, pos.y, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
         {nullptr, nullptr, nullptr},
         {nullptr, nullptr, nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), new Block(2 * BlockSize, 2 *BlockSize, GetColor())},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + 2 *BlockSize, color)},
     }
 };
     
@@ -293,27 +303,29 @@ IPiece::IPiece():Pieces(sf::Color::Blue)
 
 OPiece::OPiece():Pieces(sf::Color::Yellow)
 {   
+    sf::Vector2f pos = GetPosition();
+    sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     }
 };
     
@@ -323,27 +335,29 @@ OPiece::OPiece():Pieces(sf::Color::Yellow)
 
 TPiece::TPiece():Pieces(sf::Color::Cyan)
 {
+    sf::Vector2f pos = GetPosition();
+    sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
         {nullptr, nullptr, nullptr},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), new Block(BlockSize, 2 * BlockSize, GetColor()), new Block(2 * BlockSize, 2 *BlockSize, GetColor())}
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + 2 *BlockSize, color)}
     },
     {
-        {nullptr, nullptr, new Block(2 *BlockSize, 0, GetColor())},
-        {nullptr, new Block(BlockSize, BlockSize, GetColor()), new Block(2 * BlockSize, BlockSize, GetColor())},
-        {nullptr, nullptr, new Block(2 * BlockSize, 2 * BlockSize, GetColor())},
+        {nullptr, nullptr, new Block(pos.x + 2 *BlockSize, pos.y, color)},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {nullptr, nullptr, new Block( pos.x + 2 * BlockSize, pos.y + 2 * BlockSize, color)},
     },
     {
         {nullptr, nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), new Block(2 * BlockSize, BlockSize, GetColor())},
-        {nullptr, new Block(BlockSize, 2 * BlockSize, GetColor()), nullptr}
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), new Block(pos.x + 2 * BlockSize, pos.y + BlockSize, color)},
+        {nullptr, new Block(pos.x + BlockSize, pos.y + 2 * BlockSize, color), nullptr}
     },
     {
-        {new Block(0, 0, GetColor()), nullptr, nullptr},
-        {new Block(0, BlockSize, GetColor()), new Block(BlockSize, BlockSize, GetColor()), nullptr},
-        {new Block(0, 2 * BlockSize, GetColor()), nullptr, nullptr},
+        {new Block(pos.x , pos.y, color), nullptr, nullptr},
+        {new Block(pos.x, pos.y + BlockSize, color), new Block(pos.x + BlockSize, pos.y + BlockSize, color), nullptr},
+        {new Block(pos.x , pos.y +  2 * BlockSize, color), nullptr, nullptr},
     }
 };
     

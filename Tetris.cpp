@@ -67,7 +67,7 @@ Tetris::Tetris(sf::RenderWindow *window):m_window(window), m_score(0), m_isRunni
 
 void Tetris::Run()
 {
-    std::shared_ptr<Pieces> piece = m_factory.Create(RandomNum());
+    std::shared_ptr<Pieces> piece = m_factory.Create(6);
     float dropTime = 0.0f;
     float dropInterval = 1.0f; // Drop interval in seconds
 
