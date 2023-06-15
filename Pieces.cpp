@@ -45,30 +45,37 @@ std::vector<std::vector<Block *>> Pieces::GetState()
     return m_state[m_current_state];
 }
 
+std::vector<sf::Vector2f> Pieces::GetBlockPositions()
+{
+    std::vector<sf::Vector2f> blockPosition;
+
+    for (int row = 0; row < ROW_SIZE; row++) 
+    {
+        for (int col = 0; col < COL_SIZE; col++) 
+        {
+            if ((m_state[m_current_state])[row][col] != nullptr) 
+            {
+                blockPosition.push_back(m_state[m_current_state][row][col]->GetPosition());
+            }
+        }
+    }
+    return blockPosition;
+}
 
 void Pieces::SetPosition(int x, int y)
 {
-    for (int row = 0; row < PIECE_SIZE; row++) 
+    
+    for (int row = 0; row < ROW_SIZE; row++) 
     {
-        for (int col = 0; col < PIECE_SIZE; col++) 
+        for (int col = 0; col < COL_SIZE; col++) 
         {
-            if ((m_state[0])[row][col] != nullptr) 
+            for (auto state: m_state)
             {
-                m_state[0][row][col]->SetPosition(x,y);
+                if (state[row][col] != nullptr) 
+                {
+                    state[row][col]->SetPosition(x,y);
+                }
             }
-            if ((m_state[1])[row][col] != nullptr) 
-            {
-                m_state[1][row][col]->SetPosition(x,y);
-            }
-            if ((m_state[2])[row][col] != nullptr) 
-            {
-                m_state[2][row][col]->SetPosition(x,y);
-            }
-            if ((m_state[3])[row][col] != nullptr) 
-            {
-                m_state[3][row][col]->SetPosition(x,y);
-            }
-            
         }
     }
 }
@@ -82,9 +89,9 @@ void Pieces::SetShape(std::vector<std::vector<std::vector<Block*>>> state)
 
 void Pieces::Render(sf::RenderWindow& window)
 {
-    for (int row = 0; row < PIECE_SIZE; row++) 
+    for (int row = 0; row < ROW_SIZE; row++) 
     {
-        for (int col = 0; col < PIECE_SIZE; col++) 
+        for (int col = 0; col < COL_SIZE; col++) 
         {
             if ((m_state[m_current_state])[row][col] != nullptr) 
             {

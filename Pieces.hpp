@@ -10,7 +10,8 @@ enum Direction {
     DOWN
     };
 
-const int PIECE_SIZE = 3;
+const int ROW_SIZE = 3;
+const int COL_SIZE = 3;
 const int BlockSize = 25;
 const size_t NumOfShapes = 4;
 
@@ -43,6 +44,7 @@ public:
     sf::Vector2f GetPosition();
     void Render(sf::RenderWindow &window);
     void SetShape(std::vector<std::vector<std::vector<Block*>>> state);
+    std::vector<sf::Vector2f> GetBlockPositions();
 private:
     sf::Color m_color;
     std::vector<std::vector<std::vector<Block*>>> m_state;
