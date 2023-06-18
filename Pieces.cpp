@@ -1,4 +1,5 @@
 #include <iostream>
+#include <memory>
 #include "Pieces.hpp"
 
 Block::Block(int x, int y, sf::Color color):m_blocksize(BlockSize),m_position(x,y), m_color(color)
@@ -6,31 +7,24 @@ Block::Block(int x, int y, sf::Color color):m_blocksize(BlockSize),m_position(x,
 
 void Block::Render(sf::RenderWindow& window)
 {
+    
     sf::RectangleShape block(sf::Vector2f(BlockSize, BlockSize));
     block.setFillColor(m_color);
-    block.setPosition(m_position.x, m_position.y);
+    block.setPosition(m_position.first, m_position.second);//TODO: make sure set the correct position 
     window.draw(block);
 }
 
 void Block::SetPosition(int x, int y)
 {
-    m_position.x += x;
-    m_position.y += y;
+    m_position.first = x;
+    m_position.second = y;
 }
 
-sf::Vector2f Block::GetPosition()
+std::pair<int,int> Block::GetPosition()
 {
     return m_position;
 }
 
-bool Block::CheckCollision(const Block& other) //checks only y axis for now
-{
-    if (m_position.y + BlockSize == other.m_position.y && m_position.x  == other.m_position.x)
-    {
-        return true;
-    }
-    return false;
-}
 
 Pieces::Pieces(const sf::Color color):m_color(color), m_current_state(0), m_position(150,0)
 {
@@ -40,22 +34,27 @@ Pieces::~Pieces()
 {
 }
 
-std::vector<std::vector<Block *>> Pieces::GetState()
+std::shared_ptr<Pieces>& Block::GetPiece()
 {
-    return m_state[m_current_state];
+    return m_piece;
 }
 
-std::vector<sf::Vector2f> Pieces::GetBlockPositions()
+size_t Pieces::GetCurrentState() const
 {
-    std::vector<sf::Vector2f> blockPosition;
+    return m_current_state;
+}
+
+std::vector<Block*> Pieces::GetBlocks()
+{
+    std::vector<Block *> blockPosition;
 
     for (int row = 0; row < ROW_SIZE; row++) 
     {
         for (int col = 0; col < COL_SIZE; col++) 
         {
-            if ((m_state[m_current_state])[row][col] != nullptr) 
+            if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
             {
-                blockPosition.push_back(m_state[m_current_state][row][col]->GetPosition());
+                blockPosition.push_back(m_shapes_vector[m_current_state][row][col]->GetPosition());
             }
         }
     }
@@ -69,7 +68,7 @@ void Pieces::SetPosition(int x, int y)
     {
         for (int col = 0; col < COL_SIZE; col++) 
         {
-            for (auto state: m_state)
+            for (auto state: m_shapes_vector)
             {
                 if (state[row][col] != nullptr) 
                 {
@@ -83,7 +82,7 @@ void Pieces::SetPosition(int x, int y)
 
 void Pieces::SetShape(std::vector<std::vector<std::vector<Block*>>> state)
 {
-    m_state = state;
+    m_shapes_vector = state;
 }
 
 
@@ -93,9 +92,9 @@ void Pieces::Render(sf::RenderWindow& window)
     {
         for (int col = 0; col < COL_SIZE; col++) 
         {
-            if ((m_state[m_current_state])[row][col] != nullptr) 
+            if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
             {
-                m_state[m_current_state][row][col]->Render(window);
+                m_shapes_vector[m_current_state][row][col]->Render(window);
             }
         }
     }
@@ -106,41 +105,44 @@ sf::Color Pieces::GetColor()const
     return m_color;
 }
 
-void Pieces::Rotate(Direction direction)
+
+void Pieces::Move(Direction direction, BOARD& board)
 {
-    if (direction == LEFT)
+    for (auto block : GetBlocks())
     {
+        std::pair<int,int> position = block->GetPosition();
+        board[position.first][position.second] = nullptr;
+    } 
+    
+    std::pair<int,int> position = GetPosition();
+    switch (direction)
+    {
+    case LEFT:
+        SetPosition(position.first - 1, position.second);
+        break;
+    case RIGHT:
+        SetPosition(position.first + 1, position.second);
+        break;
+    case DOWN:
+        SetPosition(position.first, position.second + 1);
+        break;
+    case ROTATE_LEFT:
         m_current_state = (m_current_state - 1) % NumOfShapes;
-    }
-    else
-    {
+        break;
+    case ROTATE_RIGHT:
         m_current_state = (m_current_state + 1) % NumOfShapes;
+        break;
     }
+
+    for (auto block : GetBlocks())
+    {
+        std::pair<int,int> position = block->GetPosition();
+        board[position.first][position.second] = block;
+    }
+
 }
 
-void Pieces::Move(Direction direction)
-{
-
-    if (m_position.x >= 10 && direction == LEFT)
-    {
-        SetPosition(-BlockSize, 0);
-        m_position.x -= BlockSize;
-    }
-
-    else if (m_position.x <= 275 && direction == RIGHT)
-    {
-        SetPosition(BlockSize, 0);
-        m_position.x += BlockSize;
-    }
-
-    else if (direction == DOWN)
-    {
-        SetPosition(0, BlockSize);
-        m_position.y += BlockSize;
-    }
-}
-
-sf::Vector2f Pieces::GetPosition()
+std::pair<int,int> Pieces::GetPosition()
 {
     return m_position;
 }

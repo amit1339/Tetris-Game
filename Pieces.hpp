@@ -4,10 +4,14 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
+typedef Block* BOARD[10][20];
+
 enum Direction {
     LEFT,
     RIGHT,
-    DOWN
+    DOWN,
+    ROTATE_LEFT,
+    ROTATE_RIGHT
     };
 
 const int ROW_SIZE = 3;
@@ -21,12 +25,14 @@ public:
     Block(int x, int y, sf::Color color);
     void Render(sf::RenderWindow& window);
     void SetPosition(int x, int y);
-    bool CheckCollision(const Block& other);
-    sf::Vector2f GetPosition();
+    //bool CheckCollision(const Block& other);
+    std::pair<int,int> GetPosition();
+    std::shared_ptr<Pieces>& Block::GetPiece();
 private:
     const int m_blocksize;
-    sf::Vector2f m_position;
+    std::pair<int,int> m_position;
     sf::Color m_color;
+    std::shared_ptr<Pieces>& m_piece;
 };
 
 
@@ -36,20 +42,19 @@ public:
     friend class Tetris;
     Pieces(const sf::Color color);
     virtual ~Pieces();
-    void Move(Direction direction);
-    void Rotate(Direction direction);
+    void Move(Direction direction, BOARD& board);
     void SetPosition(int x, int y);
     sf::Color GetColor() const;
-    std::vector<std::vector<Block *>> GetState();
-    sf::Vector2f GetPosition();
+    size_t GetCurrentState() const;
+    std::pair<int,int> GetPosition();
     void Render(sf::RenderWindow &window);
     void SetShape(std::vector<std::vector<std::vector<Block*>>> state);
-    std::vector<sf::Vector2f> GetBlockPositions();
+    std::vector<Block *> GetBlocks();
 private:
     sf::Color m_color;
-    std::vector<std::vector<std::vector<Block*>>> m_state;
+    std::vector<std::vector<std::vector<Block*>>> m_shapes_vector;
     size_t m_current_state;
-    sf::Vector2f m_position;
+    std::pair<int,int> m_position;
 };
 
 class LPiece : public Pieces

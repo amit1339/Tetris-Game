@@ -15,6 +15,100 @@ Tetris::Tetris(sf::RenderWindow *window):m_window(window), m_score(0), m_isRunni
 {
 }
 
+bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
+{
+    int old_state = piece->GetCurrentState();
+    
+    switch (direection)
+    {
+    case DOWN:
+        for (auto block : piece->GetBlocks())
+        {
+            std::pair<int,int> position = block->GetPosition();
+            if (position.second >= 19)
+            {
+                return false;
+            }
+            if (m_board[position.first][position.second + 1] && m_board[position.first][position.second + 1] != block)
+            {
+                if (CanMove(m_board[position.first][position.second + 1]->GetPiece(), DOWN) == false)
+                {
+                    return false;
+                }
+            }
+        }
+        break;
+
+    case RIGHT:
+        for (auto block : piece->GetBlocks())
+        {
+            std::pair<int,int> position = block->GetPosition();
+            if (position.first >= 9)
+            {
+                return false;
+            }
+
+            if (m_board[position.first + 1][position.second] && m_board[position.first + 1][position.second] != block)
+            {
+                return false;
+            }
+        }
+        break;
+    case LEFT:
+        for (auto block : piece->GetBlocks())
+        {
+            std::pair<int,int> position = block->GetPosition();
+            if (position.first <= 0)
+            {
+                return false;
+            }
+
+            if (m_board[position.first - 1][position.second] && m_board[position.first - 1][position.second] != block)
+            {
+                return false;
+            }
+        }
+        break;
+
+    case ROTATE_LEFT:
+
+        piece->m_current_state = (piece->m_current_state + 1) % 4;
+
+        for (auto block : piece->GetBlocks())
+        {
+            std::pair<int,int> position = block->GetPosition();
+
+            if (m_board[position.first][position.second] && m_board[position.first][position.second] != block)
+            {
+                piece->m_current_state = old_state;
+                return true;
+            }
+        }
+        break;
+    
+    case ROTATE_RIGHT:
+
+        piece->m_current_state = (piece->m_current_state - 1) % 4;
+
+        for (auto block : piece->GetBlocks())
+        {
+            std::pair<int,int> position = block->GetPosition();
+
+            if (m_board[position.first][position.second] && m_board[position.first][position.second] != block)
+            {
+                piece->m_current_state = old_state;
+                return true;
+            }
+        }
+        break;
+
+    }
+    piece->m_current_state = old_state;
+    return true;
+}
+
+
+
 void Tetris::Run()
 {
     std::shared_ptr<Pieces> piece = m_factory.Create(RandomNum());
@@ -36,35 +130,33 @@ void Tetris::Run()
                 switch (event.key.code)
                 {
                 case sf::Keyboard::Left:
-                    piece->Move(LEFT);
-                    if (CheckCollision(piece))  // Check collision after moving
+                    if (CanMove(piece, LEFT))  
                     {
-                        piece->Move(RIGHT);  // Undo the move if there's a collision
+                        piece->Move(LEFT, m_board);
                     }
                     break;
                 case sf::Keyboard::Right:
-                    piece->Move(RIGHT);
-                    if (CheckCollision(piece))  // Check collision after moving
+                    if (CanMove(piece, RIGHT))  
                     {
-                        piece->Move(LEFT);  // Undo the move if there's a collision
+                        piece->Move(RIGHT, m_board);  
                     }
                     break;
                 case sf::Keyboard::Down:
-                    piece->Move(DOWN);
                     break;
                 case sf::Keyboard::A:
-                    piece->Rotate(LEFT);
-                    if (CheckCollision(piece))  // Check collision after rotating
+                    if (CanMove(piece, ROTATE_LEFT))  // Check collision after rotating
                     {
-                        piece->Rotate(RIGHT);  // Undo the rotation if there's a collision
+                        piece->Move(ROTATE_LEFT, m_board);
                     }
                     break;
                 case sf::Keyboard::D:
-                    piece->Rotate(RIGHT);
-                    if (CheckCollision(piece))  // Check collision after rotating
+                    if (CanMove(piece, ROTATE_RIGHT))  // Check collision after rotating
                     {
-                        piece->Rotate(LEFT);  // Undo the rotation if there's a collision
+                        piece->Move(ROTATE_RIGHT, m_board);
                     }
+                    break;
+                case sf::Keyboard::Q:
+                    m_isRunning = false;
                     break;
                 }
             }

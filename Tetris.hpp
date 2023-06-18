@@ -3,13 +3,14 @@
 
 #include <SFML/Graphics.hpp>
 #include <map>
+#include <list>
 #include "PiecesFactory.hpp"
 
 class Tetris
 {
 public:
     Tetris(sf::RenderWindow *window);
-    bool CheckCollision(const std::shared_ptr<Pieces>& piece);
+    bool CanMove(const std::shared_ptr<Pieces>& piece, Direction direection);
     bool CheckEndGame(const std::shared_ptr<Pieces>& piece);
     bool CheckScore();
     void Run();
@@ -19,10 +20,10 @@ private:
     sf::Clock m_clock;
     PiecesFactory m_factory;
     size_t m_score;
+    std::list<std::shared_ptr<Pieces>> m_dropped;
+    BOARD m_board;
     bool m_isRunning;
 };
-
-
 
 
 
