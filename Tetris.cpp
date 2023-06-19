@@ -26,14 +26,24 @@ Tetris::Tetris(sf::RenderWindow *window):m_window(window), m_score(0), m_isRunni
 bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
 {
     int old_state = piece->GetCurrentState();
+
     switch (direection)
     {
     case DOWN:
         for (auto block : piece->GetBlocks())
         {
-            if (block->CanMove(m_board, DOWN) == false)
+            std::pair<int,int> position = block->GetPosition();
+            if (position.second >= 19)
             {
                 return false;
+            }
+            Block* other = m_board[position.first][position.second + 1];
+            if (other && other->GetPiece() != block->GetPiece())
+            {
+                if (!CanMove(other->GetPiece(), DOWN))
+                {
+                    return false;
+                }
             }
         }
         break;
@@ -41,7 +51,14 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
     case RIGHT:
         for (auto block : piece->GetBlocks())
         {
-            if (block->CanMove(m_board, RIGHT) == false)
+            std::pair<int,int> position = block->GetPosition();
+            if (position.first >= 9)
+            {
+                return false;
+            }
+
+            Block* other = m_board[position.first + 1][position.second];
+            if (other && other->GetPiece() != block->GetPiece())
             {
                 return false;
             }
@@ -50,7 +67,14 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
     case LEFT:
         for (auto block : piece->GetBlocks())
         {
-            if (block->CanMove(m_board, LEFT) == false)
+            std::pair<int,int> position = block->GetPosition();
+            if (position.first <= 0)
+            {
+                return false;
+            }
+
+            Block* other = m_board[position.first - 1][position.second];
+            if (other && other->GetPiece() != block->GetPiece())
             {
                 return false;
             }
@@ -65,14 +89,15 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
         {
             std::pair<int,int> position = block->GetPosition();
 
-            if (m_board[position.first][position.second] && m_board[position.first][position.second] != block)
+            Block* other = m_board[position.first][position.second];
+            if (other && other->GetPiece() != block->GetPiece())
             {
                 piece->m_current_state = old_state;
-                return true;
+                return false;
             }
         }
         break;
-    
+
     case ROTATE_RIGHT:
 
         piece->m_current_state = (piece->m_current_state - 1) % 4;
@@ -81,10 +106,11 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
         {
             std::pair<int,int> position = block->GetPosition();
 
-            if (m_board[position.first][position.second] && m_board[position.first][position.second] != block)
+            Block* other = m_board[position.first][position.second];
+            if (other && other->GetPiece() != block->GetPiece())
             {
                 piece->m_current_state = old_state;
-                return true;
+                return false;
             }
         }
         break;
@@ -98,7 +124,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
 
 void Tetris::Run()
 {
-    std::shared_ptr<Pieces> piece = m_factory.Create(0);
+    std::shared_ptr<Pieces> piece = m_factory.Create(RandomNum());
     float dropTime = 0.0f;
     float dropInterval = 1.0f; // Drop interval in seconds */
 
@@ -174,7 +200,7 @@ void Tetris::Run()
                 m_dropped.push_back(piece);
 
                 // Create a new piece
-                piece = m_factory.Create(0);
+                piece = m_factory.Create(RandomNum());
             }
         }
 
@@ -190,5 +216,3 @@ void Tetris::Run()
         m_window->display();
     }
 }
-
-

@@ -27,7 +27,6 @@ public:
     Block(int x, int y, sf::Color color, Pieces *piece);
     void Render(sf::RenderWindow& window);
     void SetPosition(int x, int y);
-    bool CanMove(BOARD &board, Direction direection);
     std::pair<int,int> GetPosition();
     std::shared_ptr<Pieces> GetPiece();
 private:

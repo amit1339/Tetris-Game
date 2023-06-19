@@ -14,50 +14,6 @@ void Block::Render(sf::RenderWindow& window)
     window.draw(block);
 }
 
-bool Block::CanMove(BOARD &board, Direction direection)
-{
-    std::pair<int,int> position = GetPosition();
-    switch (direection)
-    {
-    case DOWN:
-
-        if (position.second >= 18)
-        {
-            return false;
-        }
-        if (board[position.first][position.second + 1] && board[position.first][position.second + 1] != this && board[position.first][position.second + 1]->CanMove(board, DOWN) == false)
-        {
-            return false;
-        }
-        break;
-    case RIGHT:
-
-        if (position.first >= 13)
-        {
-            return false;
-        }
-
-        if (board[position.first + 1][position.second] && board[position.first + 1][position.second] != this)
-        {
-            return false;
-        }
-        break;
-    
-    case LEFT:
-        if (position.first <= 0)
-        {
-            return false;
-        }
-
-        if (board[position.first - 1][position.second] && board[position.first - 1][position.second] != this)
-        {
-            return false;
-        }
-        break;
-    }
-    return true;
-}
-
 
 void Block::SetPosition(int x, int y)
 {
