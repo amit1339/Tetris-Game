@@ -11,6 +11,8 @@ class Tetris
 public:
     Tetris(sf::RenderWindow *window);
     bool CanMove(const std::shared_ptr<Pieces>& piece, Direction direection);
+    void AddScore();
+    bool CheckEndGame();
     void Run();
 
 private:

@@ -12,14 +12,16 @@ enum Direction {
     ROTATE_RIGHT
     };
 
-const int ROW_SIZE = 3;
-const int COL_SIZE = 3;
+const int MATRIX_SIZE = 3;
+const int COL_SIZE = 19;
+const int ROW_SIZE = 14;
+
 const int BlockSize = 25;
 const size_t NumOfShapes = 4;
 
 class Block;
 class Pieces;
-typedef Block* BOARD[14][19];
+typedef Block* BOARD[ROW_SIZE][COL_SIZE];
 
 class Block
 {

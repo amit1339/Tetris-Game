@@ -10,7 +10,7 @@ void Block::Render(sf::RenderWindow& window)
 {
     sf::RectangleShape block(sf::Vector2f(BlockSize, BlockSize));
     block.setFillColor(m_color);
-    block.setPosition(m_position.first * BlockSize, m_position.second * BlockSize);//TODO: make sure set the correct position 
+    block.setPosition(m_position.first * BlockSize, (m_position.second - 1) * BlockSize);//TODO: make sure set the correct position 
     window.draw(block);
 }
 
@@ -49,9 +49,9 @@ std::vector<Block*> Pieces::GetBlocks()
 {
     std::vector<Block *> blockPosition;
 
-    for (int row = 0; row < ROW_SIZE; row++) 
+    for (int row = 0; row < MATRIX_SIZE; row++) 
     {
-        for (int col = 0; col < COL_SIZE; col++) 
+        for (int col = 0; col < MATRIX_SIZE; col++) 
         {
             if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
             {
@@ -65,9 +65,9 @@ std::vector<Block*> Pieces::GetBlocks()
 void Pieces::SetPosition(int x, int y)
 {
     
-    for (int row = 0; row < ROW_SIZE; row++) 
+    for (int row = 0; row < MATRIX_SIZE; row++) 
     {
-        for (int col = 0; col < COL_SIZE; col++) 
+        for (int col = 0; col < MATRIX_SIZE; col++) 
         {
             for (auto state: m_shapes_vector)
             {
@@ -89,9 +89,9 @@ void Pieces::SetShape(std::vector<std::vector<std::vector<Block*>>> state)
 
 void Pieces::Render(sf::RenderWindow& window)
 {
-    for (int row = 0; row < ROW_SIZE; row++) 
+    for (int row = 0; row < MATRIX_SIZE; row++) 
     {
-        for (int col = 0; col < COL_SIZE; col++) 
+        for (int col = 0; col < MATRIX_SIZE; col++) 
         {
             if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
             {

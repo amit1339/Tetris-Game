@@ -13,9 +13,9 @@ int RandomNum()
 
 Tetris::Tetris(sf::RenderWindow *window):m_window(window), m_score(0), m_isRunning(true)
 {
-    for (int i = 0; i < 14; i++)
+    for (int i = 0; i < ROW_SIZE; i++)
     {
-        for (int j = 0; j < 19; j++)
+        for (int j = 0; j < COL_SIZE; j++)
         {
             m_board[i][j] = nullptr;
         }
@@ -33,7 +33,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
         for (auto block : piece->GetBlocks())
         {
             std::pair<int,int> position = block->GetPosition();
-            if (position.second >= 19)
+            if (position.second >= COL_SIZE)
             {
                 return false;
             }
@@ -52,7 +52,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
         for (auto block : piece->GetBlocks())
         {
             std::pair<int,int> position = block->GetPosition();
-            if (position.first >= 9)
+            if (position.first >= ROW_SIZE)
             {
                 return false;
             }
@@ -118,6 +118,44 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
     }
     piece->m_current_state = old_state;
     return true;
+}
+
+void Tetris::AddScore()
+{
+    int num_of_filled_rows = 0;
+    for (int row = 0; row < ROW_SIZE; row++)
+    {
+        bool isRowFilled = true;
+        for (int col = 0; col < COL_SIZE; col++)
+        {
+            if (m_board[row][col] == nullptr)
+            {
+                isRowFilled = false;
+                break;
+            }
+        }
+
+        if (isRowFilled)
+        {
+            ++num_of_filled_rows;
+        }
+    }
+
+    switch (num_of_filled_rows)
+    {
+    case 1:
+        m_score += 40;
+        break;
+    case 2:
+        m_score += 100;
+        break;
+    case 3:
+        m_score += 300;
+        break;
+    case 4:
+        m_score += 1200;
+        break;
+    }
 }
 
 
@@ -199,6 +237,8 @@ void Tetris::Run()
                 }
                 m_dropped.push_back(piece);
 
+                AddScore();
+                std::cout << m_score <<std::endl;
                 // Create a new piece
                 piece = m_factory.Create(RandomNum());
             }
