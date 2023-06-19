@@ -19,6 +19,7 @@ const size_t NumOfShapes = 4;
 
 class Block;
 class Pieces;
+typedef Block* BOARD[14][19];
 
 class Block
 {
@@ -26,7 +27,7 @@ public:
     Block(int x, int y, sf::Color color, Pieces *piece);
     void Render(sf::RenderWindow& window);
     void SetPosition(int x, int y);
-    //bool CheckCollision(const Block& other);
+    bool CanMove(BOARD &board, Direction direection);
     std::pair<int,int> GetPosition();
     std::shared_ptr<Pieces> GetPiece();
 private:
@@ -35,8 +36,6 @@ private:
     sf::Color m_color;
     std::shared_ptr<Pieces> m_piece;
 };
-
-typedef Block* BOARD[10][20];
 
 class Pieces
 {
