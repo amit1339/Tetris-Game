@@ -10,7 +10,7 @@ void Block::Render(sf::RenderWindow& window)
 {
     sf::RectangleShape block(sf::Vector2f(BlockSize, BlockSize));
     block.setFillColor(m_color);
-    block.setPosition(m_position.first * BlockSize, (m_position.second - 1) * BlockSize);//TODO: make sure set the correct position 
+    block.setPosition(m_position.first * BlockSize, m_position.second * BlockSize);//TODO: make sure set the correct position 
     window.draw(block);
 }
 
@@ -27,7 +27,7 @@ std::pair<int,int> Block::GetPosition()
 }
 
 
-Pieces::Pieces(const sf::Color color):m_color(color), m_current_state(0)
+Pieces::Pieces(const sf::Color color, int matrix_size):m_color(color), m_current_state(0), m_matrix_size(matrix_size)
 {
 }
 
@@ -49,9 +49,9 @@ std::vector<Block*> Pieces::GetBlocks()
 {
     std::vector<Block *> blockPosition;
 
-    for (int row = 0; row < MATRIX_SIZE; row++) 
+    for (int row = 0; row < m_matrix_size; row++) 
     {
-        for (int col = 0; col < MATRIX_SIZE; col++) 
+        for (int col = 0; col < m_matrix_size; col++) 
         {
             if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
             {
@@ -65,9 +65,9 @@ std::vector<Block*> Pieces::GetBlocks()
 void Pieces::SetPosition(int x, int y)
 {
     
-    for (int row = 0; row < MATRIX_SIZE; row++) 
+    for (int row = 0; row < m_matrix_size; row++) 
     {
-        for (int col = 0; col < MATRIX_SIZE; col++) 
+        for (int col = 0; col < m_matrix_size; col++) 
         {
             for (auto state: m_shapes_vector)
             {
@@ -89,9 +89,9 @@ void Pieces::SetShape(std::vector<std::vector<std::vector<Block*>>> state)
 
 void Pieces::Render(sf::RenderWindow& window)
 {
-    for (int row = 0; row < MATRIX_SIZE; row++) 
+    for (int row = 0; row < m_matrix_size; row++) 
     {
-        for (int col = 0; col < MATRIX_SIZE; col++) 
+        for (int col = 0; col < m_matrix_size; col++) 
         {
             if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
             {
@@ -101,7 +101,7 @@ void Pieces::Render(sf::RenderWindow& window)
     }
 }
 
-sf::Color Pieces::GetColor()const
+sf::Color Pieces::GetColor() const
 {
     return m_color;
 }
@@ -142,9 +142,6 @@ void Pieces::Move(Direction direction, BOARD& board)
 
 }
 
-
-
-
 LPiece::LPiece() : Pieces(sf::Color::White)
 {
     sf::Color color = GetColor();
@@ -176,7 +173,7 @@ LPiece::LPiece() : Pieces(sf::Color::White)
 
 
 
-JPiece::JPiece():Pieces(sf::Color::Magenta)
+JPiece::JPiece() : Pieces(sf::Color::Magenta)
 {
     sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
@@ -239,7 +236,7 @@ SPiece::SPiece():Pieces(sf::Color::Red)
 
 
 
-ZPiece::ZPiece():Pieces(sf::Color::Green)
+ZPiece::ZPiece() : Pieces(sf::Color::Green)
 {
     sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
@@ -271,30 +268,31 @@ ZPiece::ZPiece():Pieces(sf::Color::Green)
 
 
 
-IPiece::IPiece():Pieces(sf::Color::Blue)
+IPiece::IPiece() : Pieces(sf::Color::Blue, 4)
 {
     sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
-        {nullptr, new Block(6, 0, color, this), nullptr},
-        {nullptr, new Block(6, 1, color, this), nullptr},
-        {nullptr, new Block(6, 2, color, this), nullptr}
+        {
+            new Block(5, 0, color, this),
+            new Block(5, 1, color, this),
+            new Block(5, 2, color, this),
+            new Block(5, 3, color, this),
+        },
+    {
+        {new Block(4, 1, color, this), new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this)}
     },
     {
-        {nullptr, nullptr, nullptr},
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)},
+        {
+            new Block(6, 0, color, this),
+            new Block(6, 1, color, this),
+            new Block(6, 2, color, this),
+            new Block(6, 3, color, this),
+        },
     },
     {
-        {nullptr, new Block(6, 0, color, this), nullptr},
-        {nullptr, new Block(6, 1, color, this), nullptr},
-        {nullptr, new Block(6, 2, color, this), nullptr}
-    },
-    {
-        {nullptr, nullptr, nullptr},
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)},
+        {new Block(4, 2, color, this), new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)}
     }
 };
     
@@ -303,30 +301,16 @@ IPiece::IPiece():Pieces(sf::Color::Blue)
 
 
 
-OPiece::OPiece():Pieces(sf::Color::Yellow)
-{   
+OPiece::OPiece() : Pieces(sf::Color::Yellow, 2)
+{
     sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), nullptr}
-    },
-    {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), nullptr}
-    },
-    {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), nullptr}
-    },
-    {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), nullptr}
+        {
+            new Block(5, 1, color, this), new Block(6, 1, color, this),
+            new Block(5, 2, color, this), new Block(6, 2, color, this)
+        }
     }
 };
     
@@ -334,30 +318,36 @@ OPiece::OPiece():Pieces(sf::Color::Yellow)
 }
 
 
-TPiece::TPiece():Pieces(sf::Color::Cyan)
+TPiece::TPiece() : Pieces(sf::Color::Cyan)
 {
     sf::Color color = GetColor();
     std::vector<std::vector<std::vector<Block*>>> vector = 
 {
     {
-        {nullptr, nullptr, nullptr},
-        {nullptr, new Block(6, 1, color, this), nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)}
+        {
+                                          new Block(6, 0, color, this),
+            new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this),
+        }
     },
     {
-        {nullptr, nullptr, new Block(7, 0, color, this)},
-        {nullptr, new Block(6, 1, color, this), new Block(7, 1, color, this)},
-        {nullptr, nullptr, new Block(7, 2, color, this)},
+        {
+            new Block(6, 0, color, this),
+            new Block(6, 1, color, this), new Block(7, 1, color, this),
+            new Block(7, 2, color, this)
+        },
     },
     {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this)},
-        {nullptr, new Block(6, 2, color, this), nullptr}
+        {
+            new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this),
+                                          new Block(6, 2, color, this)
+        }
     },
     {
-        {new Block(5, 0, color, this), nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {new Block(5, 2, color, this), nullptr, nullptr},
+        {
+                                          new Block(6, 0, color, this),
+            new Block(5, 1, color, this), new Block(6, 1, color, this),
+                                          new Block(6, 2, color, this)
+        },
     }
 };
     

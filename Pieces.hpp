@@ -12,7 +12,6 @@ enum Direction {
     ROTATE_RIGHT
     };
 
-const int MATRIX_SIZE = 3;
 const int COL_SIZE = 19;
 const int ROW_SIZE = 14;
 
@@ -42,7 +41,7 @@ class Pieces
 {
 public:
     friend class Tetris;
-    Pieces(const sf::Color color);
+    Pieces(const sf::Color color, int matrix_size=3);
     virtual ~Pieces();
     void Move(Direction direction, BOARD& board);
     void SetPosition(int x, int y);
@@ -55,6 +54,7 @@ private:
     sf::Color m_color;
     std::vector<std::vector<std::vector<Block*>>> m_shapes_vector;
     size_t m_current_state;
+    int m_matrix_size;
 };
 
 class LPiece : public Pieces

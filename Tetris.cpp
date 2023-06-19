@@ -237,8 +237,8 @@ void Tetris::Run()
                 }
                 m_dropped.push_back(piece);
 
+                std::cout << "Elon" <<std::endl;
                 AddScore();
-                std::cout << m_score <<std::endl;
                 // Create a new piece
                 piece = m_factory.Create(RandomNum());
             }
