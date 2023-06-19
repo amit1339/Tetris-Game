@@ -13,12 +13,19 @@ int RandomNum()
 
 Tetris::Tetris(sf::RenderWindow *window):m_window(window), m_score(0), m_isRunning(true)
 {
+    for (int i = 0; i < 10; i++)
+    {
+        for (int j = 0; j < 20; j++)
+        {
+            m_board[i][j] = nullptr;
+        }
+    }
+    
 }
 
 bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
 {
     int old_state = piece->GetCurrentState();
-    
     switch (direection)
     {
     case DOWN:
@@ -31,7 +38,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
             }
             if (m_board[position.first][position.second + 1] && m_board[position.first][position.second + 1] != block)
             {
-                if (CanMove(m_board[position.first][position.second + 1]->GetPiece(), DOWN) == false)
+                if (m_board[position.first][position.second + 1] != nullptr && CanMove(m_board[position.first][position.second + 1]->GetPiece(), DOWN) == false)
                 {
                     return false;
                 }
@@ -48,7 +55,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
                 return false;
             }
 
-            if (m_board[position.first + 1][position.second] && m_board[position.first + 1][position.second] != block)
+            if (m_board[position.first + 1][position.second] == nullptr && m_board[position.first + 1][position.second] != block)
             {
                 return false;
             }
@@ -111,9 +118,9 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
 
 void Tetris::Run()
 {
-    std::shared_ptr<Pieces> piece = m_factory.Create(RandomNum());
+    std::shared_ptr<Pieces> piece = m_factory.Create(1);
     float dropTime = 0.0f;
-    float dropInterval = 1.0f; // Drop interval in seconds
+    float dropInterval = 1.0f; // Drop interval in seconds */
 
     while (m_isRunning && m_window->isOpen())
     {
@@ -142,6 +149,10 @@ void Tetris::Run()
                     }
                     break;
                 case sf::Keyboard::Down:
+                    if (CanMove(piece, DOWN))  
+                    {
+                        piece->Move(DOWN, m_board);  
+                    }
                     break;
                 case sf::Keyboard::A:
                     if (CanMove(piece, ROTATE_LEFT))  // Check collision after rotating
@@ -165,24 +176,13 @@ void Tetris::Run()
         float deltaTime = m_clock.restart().asSeconds();
         dropTime += deltaTime;
 
-        if (CheckCollision(piece) || piece->GetPosition().y >= 395)
+        if (dropTime >= dropInterval)
         {
-            if (CheckEndGame(piece))
-            {
-                std::cout << "Game over! Your score: " << m_score << std::endl;
-                m_isRunning = false;
-            }
-            else
-            {
-                m_dropped.push_back(piece);
-                piece = m_factory.Create(RandomNum());
-                dropTime = 0.0f;
-            }
-        }
-        else if (dropTime >= dropInterval)
-        {
-            piece->Move(DOWN);
             dropTime = 0.0f;
+            if (CanMove(piece, DOWN))
+            {
+                piece->Move(DOWN, m_board);
+            }
         }
 
         m_window->clear();
@@ -196,16 +196,5 @@ void Tetris::Run()
 
         m_window->display();
     }
-
-    while (m_window->isOpen())
-    {
-        sf::Event event;
-        while (m_window->pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                m_window->close();
-            }
-        }
-    }
 }
+

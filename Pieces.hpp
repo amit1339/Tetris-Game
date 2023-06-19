@@ -4,8 +4,6 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 
-typedef Block* BOARD[10][20];
-
 enum Direction {
     LEFT,
     RIGHT,
@@ -19,22 +17,26 @@ const int COL_SIZE = 3;
 const int BlockSize = 25;
 const size_t NumOfShapes = 4;
 
+class Block;
+class Pieces;
+
 class Block
 {
 public:
-    Block(int x, int y, sf::Color color);
+    Block(int x, int y, sf::Color color, Pieces *piece);
     void Render(sf::RenderWindow& window);
     void SetPosition(int x, int y);
     //bool CheckCollision(const Block& other);
     std::pair<int,int> GetPosition();
-    std::shared_ptr<Pieces>& Block::GetPiece();
+    std::shared_ptr<Pieces> GetPiece();
 private:
     const int m_blocksize;
     std::pair<int,int> m_position;
     sf::Color m_color;
-    std::shared_ptr<Pieces>& m_piece;
+    std::shared_ptr<Pieces> m_piece;
 };
 
+typedef Block* BOARD[10][20];
 
 class Pieces
 {
@@ -46,7 +48,6 @@ public:
     void SetPosition(int x, int y);
     sf::Color GetColor() const;
     size_t GetCurrentState() const;
-    std::pair<int,int> GetPosition();
     void Render(sf::RenderWindow &window);
     void SetShape(std::vector<std::vector<std::vector<Block*>>> state);
     std::vector<Block *> GetBlocks();
@@ -54,7 +55,6 @@ private:
     sf::Color m_color;
     std::vector<std::vector<std::vector<Block*>>> m_shapes_vector;
     size_t m_current_state;
-    std::pair<int,int> m_position;
 };
 
 class LPiece : public Pieces

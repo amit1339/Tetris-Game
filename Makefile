@@ -6,7 +6,7 @@ GAME_MAIN = Test.cpp
 NAME = Tetris_Game
 
 # Compiler flags
-CPPFLAGS = -lsfml-graphics -lsfml-window -lsfml-system
+CPPFLAGS = -lsfml-graphics -lsfml-window -lsfml-system -g
 CC = g++
 
 $(NAME): $(SRCS) $(GAME_MAIN)
