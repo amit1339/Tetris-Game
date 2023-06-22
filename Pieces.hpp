@@ -48,11 +48,13 @@ public:
     sf::Color GetColor() const;
     size_t GetCurrentState() const;
     void Render(sf::RenderWindow &window);
-    void SetShape(std::vector<std::vector<std::vector<Block*>>> state);
+    void SetShape(std::vector<std::vector<Block*>> state);
     std::vector<Block *> GetBlocks();
+    void FreeAllStates();
+
 private:
     sf::Color m_color;
-    std::vector<std::vector<std::vector<Block*>>> m_shapes_vector;
+    std::vector<std::vector<Block*>> m_shapes_vector;
     size_t m_current_state;
     int m_matrix_size;
 };

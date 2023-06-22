@@ -235,10 +235,10 @@ void Tetris::Run()
                     std::pair<int, int> position = block->GetPosition();
                     m_board[position.first][position.second] = block;
                 }
+                
+                //piece->FreeAllStates();
                 m_dropped.push_back(piece);
-
-                std::cout << "Elon" <<std::endl;
-                AddScore();
+                //AddScore();
                 // Create a new piece
                 piece = m_factory.Create(RandomNum());
             }

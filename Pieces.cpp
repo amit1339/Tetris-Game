@@ -49,15 +49,9 @@ std::vector<Block*> Pieces::GetBlocks()
 {
     std::vector<Block *> blockPosition;
 
-    for (int row = 0; row < m_matrix_size; row++) 
+    for (auto block : m_shapes_vector[m_current_state])
     {
-        for (int col = 0; col < m_matrix_size; col++) 
-        {
-            if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
-            {
-                blockPosition.push_back(m_shapes_vector[m_current_state][row][col]);
-            }
-        }
+        blockPosition.push_back(block);
     }
     return blockPosition;
 }
@@ -65,23 +59,17 @@ std::vector<Block*> Pieces::GetBlocks()
 void Pieces::SetPosition(int x, int y)
 {
     
-    for (int row = 0; row < m_matrix_size; row++) 
+    for (auto state : m_shapes_vector)
     {
-        for (int col = 0; col < m_matrix_size; col++) 
+        for (auto block : state)
         {
-            for (auto state: m_shapes_vector)
-            {
-                if (state[row][col] != nullptr) 
-                {
-                    state[row][col]->SetPosition(x,y);
-                }
-            }
+            block->SetPosition(x,y);
         }
     }
 }
 
 
-void Pieces::SetShape(std::vector<std::vector<std::vector<Block*>>> state)
+void Pieces::SetShape(std::vector<std::vector<Block*>> state)
 {
     m_shapes_vector = state;
 }
@@ -89,15 +77,9 @@ void Pieces::SetShape(std::vector<std::vector<std::vector<Block*>>> state)
 
 void Pieces::Render(sf::RenderWindow& window)
 {
-    for (int row = 0; row < m_matrix_size; row++) 
+    for (auto block : m_shapes_vector[m_current_state])
     {
-        for (int col = 0; col < m_matrix_size; col++) 
-        {
-            if ((m_shapes_vector[m_current_state])[row][col] != nullptr) 
-            {
-                m_shapes_vector[m_current_state][row][col]->Render(window);
-            }
-        }
+        block->Render(window);
     }
 }
 
@@ -142,30 +124,48 @@ void Pieces::Move(Direction direction, BOARD& board)
 
 }
 
+void Pieces::FreeAllStates()
+{
+    auto current = m_shapes_vector[m_current_state];
+
+    for (auto state : m_shapes_vector)
+    {
+        if (state != current)
+        {
+            for (auto block : state)
+            {
+                delete block;
+                block = nullptr;
+            }
+            
+        }
+        
+    }
+}
+
+
 LPiece::LPiece() : Pieces(sf::Color::White)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<std::vector<Block*>>> vector = 
+    std::vector<std::vector<Block*>> vector = 
     {
         {
-            {new Block(5, 0, color, this), nullptr, nullptr},
-            {new Block(5, 1, color, this), nullptr, nullptr},
-            {new Block(5, 2, color, this), new Block(6, 2, color, this), nullptr}
+            new Block(5, 0, color, this),
+            new Block(5, 1, color, this),
+            new Block(5, 2, color, this), new Block(6, 2, color, this),
         },
         {
-            {nullptr, nullptr, nullptr},
-            {nullptr, nullptr, new Block(7, 1, color, this)},
-            {new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)},
+                                                                        new Block(7, 1, color, this),
+            new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)
         },
         {
-            {nullptr, new Block(6, 0, color, this), new Block(7, 0, color, this)},
-            {nullptr, nullptr, new Block(7, 1, color, this)},
-            {nullptr, nullptr, new Block(7, 2, color, this)},
+            new Block(6, 0, color, this), new Block(7, 0, color, this),
+                                          new Block(7, 1, color, this),
+                                          new Block(7, 2, color, this),
         },
         {
-            {new Block(5, 0, color, this), new Block(6, 0, color, this), new Block(7, 0, color, this)},
-            {new Block(5, 1, color, this), nullptr, nullptr},
-            {nullptr, nullptr, nullptr},
+            new Block(5, 0, color, this), new Block(6, 0, color, this), new Block(7, 0, color, this),
+            new Block(5, 1, color, this), 
         }
     };
     SetShape(vector);
@@ -176,27 +176,25 @@ LPiece::LPiece() : Pieces(sf::Color::White)
 JPiece::JPiece() : Pieces(sf::Color::Magenta)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<std::vector<Block*>>> vector = 
+    std::vector<std::vector<Block*>> vector = 
 {
     {
-        {nullptr, nullptr, new Block(7, 0, color, this)},
-        {nullptr, nullptr, new Block(7, 1, color, this)},
-        {nullptr, new Block(6, 2, color, this), new Block(7, 2, color, this)}
+                                    new Block(7, 0, color, this),
+                                    new Block(7, 1, color, this),
+        new Block(6, 2, color, this), new Block(7, 2, color, this)
     },
     {
-        {new Block(5, 0, color, this),  new Block(6, 0, color, this),  new Block(7, 0, color, this)},
-        {nullptr, nullptr, new Block(7, 1, color, this)},
-        {nullptr, nullptr, nullptr},
+        new Block(5, 0, color, this),  new Block(6, 0, color, this),  new Block(7, 0, color, this),
+        new Block(7, 1, color, this)
     },
     {
-        {new Block(5, 0, color, this), new Block(6, 0, color, this), nullptr},
-        {new Block(5, 1, color, this), nullptr, nullptr},
-        {new Block(5, 2, color, this), nullptr, nullptr},
+        new Block(5, 0, color, this), new Block(6, 0, color, this),
+        new Block(5, 1, color, this),
+        new Block(5, 2, color, this),
     },
     {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), nullptr, nullptr},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)},
+        new Block(5, 1, color, this),
+        new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)
     }
 };
     
@@ -207,28 +205,26 @@ JPiece::JPiece() : Pieces(sf::Color::Magenta)
 SPiece::SPiece():Pieces(sf::Color::Red)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<std::vector<Block*>>> vector = 
+    std::vector<std::vector<Block*>> vector = 
 {
     {
-        {nullptr, nullptr, nullptr},
-        {nullptr, new Block(6, 1, color, this), new Block(7, 1, color, this)},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), nullptr}
+                                      new Block(6, 1, color, this), new Block(7, 1, color, this),
+        new Block(5, 2, color, this), new Block(6, 2, color, this)
     },
     {
-        {new Block(5, 0, color, this), nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {nullptr, new Block(6, 2, color, this), nullptr},
+                                      new Block(5, 0, color, this),
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+        new Block(6, 2, color, this),
     },
     {
-        {nullptr, nullptr, nullptr},
-        {nullptr, new Block(6, 1, color, this), new Block(7, 1, color, this)},
-        {new Block(5, 2, color, this), new Block(6, 2, color, this), nullptr}
+                                      new Block(6, 1, color, this), new Block(7, 1, color, this),
+        new Block(5, 2, color, this), new Block(6, 2, color, this)
     },
     {
-        {new Block(5, 0, color, this), nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {nullptr, new Block(6, 2, color, this), nullptr},
-    }
+                                      new Block(5, 0, color, this),
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+        new Block(6, 2, color, this),
+    },
 };
     
     SetShape(vector);
@@ -239,28 +235,26 @@ SPiece::SPiece():Pieces(sf::Color::Red)
 ZPiece::ZPiece() : Pieces(sf::Color::Green)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<std::vector<Block*>>> vector = 
+    std::vector<std::vector<Block*>> vector = 
 {
     {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {nullptr, new Block(6, 2, color, this), new Block(7, 2, color, this)}
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+                                    new Block(6, 2, color, this), new Block(7, 2, color, this)
     },
     {
-        {nullptr, nullptr, new Block(7, 0, color, this)},
-        {nullptr, new Block(6, 1, color, this), new Block(7, 1, color, this)},
-        {nullptr, new Block(6, 2, color, this), nullptr},
+        new Block(7, 0, color, this),
+        new Block(6, 1, color, this), new Block(7, 1, color, this),
+                                      new Block(6, 2, color, this)
     },
     {
-        {nullptr, nullptr, nullptr},
-        {new Block(5, 1, color, this), new Block(6, 1, color, this), nullptr},
-        {nullptr, new Block(6, 2, color, this), new Block(7, 2, color, this)}
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+                                    new Block(6, 2, color, this), new Block(7, 2, color, this)
     },
     {
-        {nullptr, nullptr, new Block(7, 0, color, this)},
-        {nullptr, new Block(6, 1, color, this), new Block(7, 1, color, this)},
-        {nullptr, new Block(6, 2, color, this), nullptr},
-    }
+        new Block(7, 0, color, this),
+        new Block(6, 1, color, this), new Block(7, 1, color, this),
+                                      new Block(6, 2, color, this)
+    },
 };
     
     SetShape(vector);
@@ -271,8 +265,7 @@ ZPiece::ZPiece() : Pieces(sf::Color::Green)
 IPiece::IPiece() : Pieces(sf::Color::Blue, 4)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<std::vector<Block*>>> vector = 
-{
+    std::vector<std::vector<Block*>> vector = 
     {
         {
             new Block(5, 0, color, this),
@@ -304,7 +297,7 @@ IPiece::IPiece() : Pieces(sf::Color::Blue, 4)
 OPiece::OPiece() : Pieces(sf::Color::Yellow, 2)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<std::vector<Block*>>> vector = 
+    std::vector<std::vector<Block*>> vector = 
 {
     {
         {
@@ -321,7 +314,7 @@ OPiece::OPiece() : Pieces(sf::Color::Yellow, 2)
 TPiece::TPiece() : Pieces(sf::Color::Cyan)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<std::vector<Block*>>> vector = 
+    std::vector<std::vector<Block*>> vector = 
 {
     {
         {
