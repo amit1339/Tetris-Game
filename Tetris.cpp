@@ -23,17 +23,17 @@ Tetris::Tetris(sf::RenderWindow *window):m_window(window), m_score(0), m_isRunni
     
 }
 
-bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
+bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direction)
 {
     int old_state = piece->GetCurrentState();
 
-    switch (direection)
+    switch (direction)
     {
     case DOWN:
         for (auto block : piece->GetBlocks())
         {
             std::pair<int,int> position = block->GetPosition();
-            if (position.second >= COL_SIZE)
+            if (position.second >= COL_SIZE || position.second + 1 >= COL_SIZE)
             {
                 return false;
             }
@@ -52,7 +52,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
         for (auto block : piece->GetBlocks())
         {
             std::pair<int,int> position = block->GetPosition();
-            if (position.first >= ROW_SIZE)
+            if (position.first >= ROW_SIZE || position.first + 1 >= ROW_SIZE)
             {
                 return false;
             }
@@ -64,11 +64,12 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
             }
         }
         break;
+
     case LEFT:
         for (auto block : piece->GetBlocks())
         {
             std::pair<int,int> position = block->GetPosition();
-            if (position.first <= 0)
+            if (position.first <= 0 || position.first - 1 < 0)
             {
                 return false;
             }
@@ -82,12 +83,16 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
         break;
 
     case ROTATE_LEFT:
-
         piece->m_current_state = (piece->m_current_state + 1) % 4;
 
         for (auto block : piece->GetBlocks())
         {
             std::pair<int,int> position = block->GetPosition();
+            if (position.first < 0 || position.first >= ROW_SIZE || position.second < 0 || position.second >= COL_SIZE)
+            {
+                piece->m_current_state = old_state;
+                return false;
+            }
 
             Block* other = m_board[position.first][position.second];
             if (other && other->GetPiece() != block->GetPiece())
@@ -99,12 +104,16 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
         break;
 
     case ROTATE_RIGHT:
-
         piece->m_current_state = (piece->m_current_state - 1) % 4;
 
         for (auto block : piece->GetBlocks())
         {
             std::pair<int,int> position = block->GetPosition();
+            if (position.first < 0 || position.first >= ROW_SIZE || position.second < 0 || position.second >= COL_SIZE)
+            {
+                piece->m_current_state = old_state;
+                return false;
+            }
 
             Block* other = m_board[position.first][position.second];
             if (other && other->GetPiece() != block->GetPiece())
@@ -114,19 +123,38 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direection)
             }
         }
         break;
-
     }
+
     piece->m_current_state = old_state;
     return true;
 }
 
+void Tetris::DeleteRow(int col)
+{
+    for (int row = 0; row < ROW_SIZE; row++)
+    {
+        //delete m_board[row][col];
+        m_board[row][col] = nullptr;
+    }
+    
+    for (int c = col; c > 0; c--)
+    {
+        for (int row = 0; row < ROW_SIZE; row++)
+        {
+            m_board[row][c] = m_board[row][c - 1];
+            m_board[row][c - 1] = nullptr;
+        }
+    }
+}
+
+
 void Tetris::AddScore()
 {
     int num_of_filled_rows = 0;
-    for (int row = 0; row < ROW_SIZE; row++)
+    for (int col = 0; col < COL_SIZE; col++)
     {
         bool isRowFilled = true;
-        for (int col = 0; col < COL_SIZE; col++)
+        for (int row = 0; row < ROW_SIZE; row++)
         {
             if (m_board[row][col] == nullptr)
             {
@@ -134,10 +162,12 @@ void Tetris::AddScore()
                 break;
             }
         }
-
+        
         if (isRowFilled)
         {
             ++num_of_filled_rows;
+            if (col >= 0 && col < COL_SIZE)  // Check if col is within valid range
+                DeleteRow(col);
         }
     }
 
@@ -157,6 +187,7 @@ void Tetris::AddScore()
         break;
     }
 }
+
 
 
 
@@ -238,7 +269,8 @@ void Tetris::Run()
                 
                 //piece->FreeAllStates();
                 m_dropped.push_back(piece);
-                //AddScore();
+                AddScore();
+                std::cout << m_score << std::endl;
                 // Create a new piece
                 piece = m_factory.Create(RandomNum());
             }

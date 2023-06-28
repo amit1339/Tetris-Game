@@ -12,6 +12,7 @@ public:
     Tetris(sf::RenderWindow *window);
     bool CanMove(const std::shared_ptr<Pieces>& piece, Direction direection);
     void AddScore();
+    void DeleteRow(int col);
     bool CheckEndGame();
     void Run();
 

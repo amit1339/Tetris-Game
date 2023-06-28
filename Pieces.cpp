@@ -10,7 +10,7 @@ void Block::Render(sf::RenderWindow& window)
 {
     sf::RectangleShape block(sf::Vector2f(BlockSize, BlockSize));
     block.setFillColor(m_color);
-    block.setPosition(m_position.first * BlockSize, m_position.second * BlockSize);//TODO: make sure set the correct position 
+    block.setPosition(m_position.first * BlockSize, m_position.second * BlockSize); 
     window.draw(block);
 }
 
@@ -135,13 +135,15 @@ void Pieces::FreeAllStates()
             for (auto block : state)
             {
                 delete block;
-                block = nullptr;
             }
-            
+            state.clear(); // Clear the vector after deleting the blocks
         }
-        
     }
+
+    m_shapes_vector.clear(); // Clear the entire vector before adding the current state
+    m_shapes_vector.push_back(current);
 }
+
 
 
 LPiece::LPiece() : Pieces(sf::Color::White)
@@ -273,20 +275,18 @@ IPiece::IPiece() : Pieces(sf::Color::Blue, 4)
             new Block(5, 2, color, this),
             new Block(5, 3, color, this),
         },
-    {
-        {new Block(4, 1, color, this), new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this)}
-    },
-    {
+        {
+            new Block(4, 1, color, this), new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this)
+        },
         {
             new Block(6, 0, color, this),
             new Block(6, 1, color, this),
             new Block(6, 2, color, this),
             new Block(6, 3, color, this),
         },
-    },
-    {
-        {new Block(4, 2, color, this), new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)}
-    }
+        {
+            new Block(4, 2, color, this), new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)
+        }
 };
     
     SetShape(vector);
@@ -300,10 +300,20 @@ OPiece::OPiece() : Pieces(sf::Color::Yellow, 2)
     std::vector<std::vector<Block*>> vector = 
 {
     {
-        {
-            new Block(5, 1, color, this), new Block(6, 1, color, this),
-            new Block(5, 2, color, this), new Block(6, 2, color, this)
-        }
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+        new Block(5, 2, color, this), new Block(6, 2, color, this)
+    },
+    {
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+        new Block(5, 2, color, this), new Block(6, 2, color, this)
+    },
+    {
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+        new Block(5, 2, color, this), new Block(6, 2, color, this)
+    },
+    {
+        new Block(5, 1, color, this), new Block(6, 1, color, this),
+        new Block(5, 2, color, this), new Block(6, 2, color, this)
     }
 };
     
@@ -324,9 +334,9 @@ TPiece::TPiece() : Pieces(sf::Color::Cyan)
     },
     {
         {
-            new Block(6, 0, color, this),
+                                          new Block(7, 0, color, this),
             new Block(6, 1, color, this), new Block(7, 1, color, this),
-            new Block(7, 2, color, this)
+                                          new Block(7, 2, color, this)
         },
     },
     {
@@ -337,12 +347,14 @@ TPiece::TPiece() : Pieces(sf::Color::Cyan)
     },
     {
         {
-                                          new Block(6, 0, color, this),
-            new Block(5, 1, color, this), new Block(6, 1, color, this),
-                                          new Block(6, 2, color, this)
+            new Block(6, 0, color, this),
+            new Block(6, 1, color, this), new Block(7, 1, color, this),
+            new Block(6, 2, color, this)
         },
     }
 };
     
     SetShape(vector);
 }
+
+
