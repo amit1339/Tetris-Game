@@ -26,6 +26,17 @@ std::pair<int,int> Block::GetPosition()
     return m_position;
 }
 
+void Pieces::RemoveBlock(std::shared_ptr<Block> &block)
+{
+    for (auto i = GetBlocks().begin(); i != GetBlocks().end(); ++i)
+    {
+        if (*i == block)
+        {
+            GetBlocks().erase(i);
+            break;  // Break out of the loop after erasing the element
+        }
+    }
+}
 
 Pieces::Pieces(const sf::Color color, int matrix_size):m_color(color), m_current_state(0), m_matrix_size(matrix_size)
 {
@@ -45,15 +56,9 @@ size_t Pieces::GetCurrentState() const
     return m_current_state;
 }
 
-std::vector<Block*> Pieces::GetBlocks()
+std::vector<std::shared_ptr<Block>> Pieces::GetBlocks()
 {
-    std::vector<Block *> blockPosition;
-
-    for (auto block : m_shapes_vector[m_current_state])
-    {
-        blockPosition.push_back(block);
-    }
-    return blockPosition;
+    return m_shapes_vector[m_current_state];
 }
 
 void Pieces::SetPosition(int x, int y)
@@ -68,8 +73,13 @@ void Pieces::SetPosition(int x, int y)
     }
 }
 
+void Block::SetColor(sf::Color color)
+{
+    m_color = color;
+}
 
-void Pieces::SetShape(std::vector<std::vector<Block*>> state)
+
+void Pieces::SetShape(std::vector<std::vector<std::shared_ptr<Block>>> state)
 {
     m_shapes_vector = state;
 }
@@ -134,7 +144,7 @@ void Pieces::FreeAllStates()
         {
             for (auto block : state)
             {
-                delete block;
+                block = nullptr;
             }
             state.clear(); // Clear the vector after deleting the blocks
         }
@@ -149,25 +159,25 @@ void Pieces::FreeAllStates()
 LPiece::LPiece() : Pieces(sf::Color::White)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<Block*>> vector = 
+    std::vector<std::vector<std::shared_ptr<Block>>> vector = 
     {
         {
-            new Block(5, 0, color, this),
-            new Block(5, 1, color, this),
-            new Block(5, 2, color, this), new Block(6, 2, color, this),
+            std::make_shared<Block>(5, 0, color, this),
+            std::make_shared<Block>(5, 1, color, this),
+            std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this),
         },
         {
-                                                                        new Block(7, 1, color, this),
-            new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)
+                                                                        std::make_shared<Block>(7, 1, color, this),
+            std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this), std::make_shared<Block>(7, 2, color, this)
         },
         {
-            new Block(6, 0, color, this), new Block(7, 0, color, this),
-                                          new Block(7, 1, color, this),
-                                          new Block(7, 2, color, this),
+            std::make_shared<Block>(6, 0, color, this), std::make_shared<Block>(7, 0, color, this),
+                                          std::make_shared<Block>(7, 1, color, this),
+                                          std::make_shared<Block>(7, 2, color, this),
         },
         {
-            new Block(5, 0, color, this), new Block(6, 0, color, this), new Block(7, 0, color, this),
-            new Block(5, 1, color, this), 
+            std::make_shared<Block>(5, 0, color, this), std::make_shared<Block>(6, 0, color, this), std::make_shared<Block>(7, 0, color, this),
+            std::make_shared<Block>(5, 1, color, this), 
         }
     };
     SetShape(vector);
@@ -178,25 +188,25 @@ LPiece::LPiece() : Pieces(sf::Color::White)
 JPiece::JPiece() : Pieces(sf::Color::Magenta)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<Block*>> vector = 
+    std::vector<std::vector<std::shared_ptr<Block>>> vector = 
 {
     {
-                                    new Block(7, 0, color, this),
-                                    new Block(7, 1, color, this),
-        new Block(6, 2, color, this), new Block(7, 2, color, this)
+                                    std::make_shared<Block>(7, 0, color, this),
+                                    std::make_shared<Block>(7, 1, color, this),
+        std::make_shared<Block>(6, 2, color, this), std::make_shared<Block>(7, 2, color, this)
     },
     {
-        new Block(5, 0, color, this),  new Block(6, 0, color, this),  new Block(7, 0, color, this),
-        new Block(7, 1, color, this)
+        std::make_shared<Block>(5, 0, color, this),  std::make_shared<Block>(6, 0, color, this),  std::make_shared<Block>(7, 0, color, this),
+        std::make_shared<Block>(7, 1, color, this)
     },
     {
-        new Block(5, 0, color, this), new Block(6, 0, color, this),
-        new Block(5, 1, color, this),
-        new Block(5, 2, color, this),
+        std::make_shared<Block>(5, 0, color, this), std::make_shared<Block>(6, 0, color, this),
+        std::make_shared<Block>(5, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this),
     },
     {
-        new Block(5, 1, color, this),
-        new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)
+        std::make_shared<Block>(5, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this), std::make_shared<Block>(7, 2, color, this)
     }
 };
     
@@ -207,25 +217,25 @@ JPiece::JPiece() : Pieces(sf::Color::Magenta)
 SPiece::SPiece():Pieces(sf::Color::Red)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<Block*>> vector = 
+    std::vector<std::vector<std::shared_ptr<Block>>> vector = 
 {
     {
-                                      new Block(6, 1, color, this), new Block(7, 1, color, this),
-        new Block(5, 2, color, this), new Block(6, 2, color, this)
+                                      std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this)
     },
     {
-                                      new Block(5, 0, color, this),
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-        new Block(6, 2, color, this),
+                                      std::make_shared<Block>(5, 0, color, this),
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+        std::make_shared<Block>(6, 2, color, this),
     },
     {
-                                      new Block(6, 1, color, this), new Block(7, 1, color, this),
-        new Block(5, 2, color, this), new Block(6, 2, color, this)
+                                      std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this)
     },
     {
-                                      new Block(5, 0, color, this),
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-        new Block(6, 2, color, this),
+                                      std::make_shared<Block>(5, 0, color, this),
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+        std::make_shared<Block>(6, 2, color, this),
     },
 };
     
@@ -237,25 +247,25 @@ SPiece::SPiece():Pieces(sf::Color::Red)
 ZPiece::ZPiece() : Pieces(sf::Color::Green)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<Block*>> vector = 
+    std::vector<std::vector<std::shared_ptr<Block>>> vector = 
 {
     {
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-                                    new Block(6, 2, color, this), new Block(7, 2, color, this)
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+                                    std::make_shared<Block>(6, 2, color, this), std::make_shared<Block>(7, 2, color, this)
     },
     {
-        new Block(7, 0, color, this),
-        new Block(6, 1, color, this), new Block(7, 1, color, this),
-                                      new Block(6, 2, color, this)
+        std::make_shared<Block>(7, 0, color, this),
+        std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
+                                      std::make_shared<Block>(6, 2, color, this)
     },
     {
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-                                    new Block(6, 2, color, this), new Block(7, 2, color, this)
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+                                    std::make_shared<Block>(6, 2, color, this), std::make_shared<Block>(7, 2, color, this)
     },
     {
-        new Block(7, 0, color, this),
-        new Block(6, 1, color, this), new Block(7, 1, color, this),
-                                      new Block(6, 2, color, this)
+        std::make_shared<Block>(7, 0, color, this),
+        std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
+                                      std::make_shared<Block>(6, 2, color, this)
     },
 };
     
@@ -267,25 +277,25 @@ ZPiece::ZPiece() : Pieces(sf::Color::Green)
 IPiece::IPiece() : Pieces(sf::Color::Blue, 4)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<Block*>> vector = 
+    std::vector<std::vector<std::shared_ptr<Block>>> vector = 
     {
         {
-            new Block(5, 0, color, this),
-            new Block(5, 1, color, this),
-            new Block(5, 2, color, this),
-            new Block(5, 3, color, this),
+            std::make_shared<Block>(5, 0, color, this),
+            std::make_shared<Block>(5, 1, color, this),
+            std::make_shared<Block>(5, 2, color, this),
+            std::make_shared<Block>(5, 3, color, this),
         },
         {
-            new Block(4, 1, color, this), new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this)
+            std::make_shared<Block>(4, 1, color, this), std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this)
         },
         {
-            new Block(6, 0, color, this),
-            new Block(6, 1, color, this),
-            new Block(6, 2, color, this),
-            new Block(6, 3, color, this),
+            std::make_shared<Block>(6, 0, color, this),
+            std::make_shared<Block>(6, 1, color, this),
+            std::make_shared<Block>(6, 2, color, this),
+            std::make_shared<Block>(6, 3, color, this),
         },
         {
-            new Block(4, 2, color, this), new Block(5, 2, color, this), new Block(6, 2, color, this), new Block(7, 2, color, this)
+            std::make_shared<Block>(4, 2, color, this), std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this), std::make_shared<Block>(7, 2, color, this)
         }
 };
     
@@ -297,23 +307,23 @@ IPiece::IPiece() : Pieces(sf::Color::Blue, 4)
 OPiece::OPiece() : Pieces(sf::Color::Yellow, 2)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<Block*>> vector = 
+    std::vector<std::vector<std::shared_ptr<Block>>> vector = 
 {
     {
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-        new Block(5, 2, color, this), new Block(6, 2, color, this)
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this)
     },
     {
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-        new Block(5, 2, color, this), new Block(6, 2, color, this)
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this)
     },
     {
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-        new Block(5, 2, color, this), new Block(6, 2, color, this)
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this)
     },
     {
-        new Block(5, 1, color, this), new Block(6, 1, color, this),
-        new Block(5, 2, color, this), new Block(6, 2, color, this)
+        std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this),
+        std::make_shared<Block>(5, 2, color, this), std::make_shared<Block>(6, 2, color, this)
     }
 };
     
@@ -324,32 +334,32 @@ OPiece::OPiece() : Pieces(sf::Color::Yellow, 2)
 TPiece::TPiece() : Pieces(sf::Color::Cyan)
 {
     sf::Color color = GetColor();
-    std::vector<std::vector<Block*>> vector = 
+    std::vector<std::vector<std::shared_ptr<Block>>> vector = 
 {
     {
         {
-                                          new Block(6, 0, color, this),
-            new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this),
+                                          std::make_shared<Block>(6, 0, color, this),
+            std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
         }
     },
     {
         {
-                                          new Block(7, 0, color, this),
-            new Block(6, 1, color, this), new Block(7, 1, color, this),
-                                          new Block(7, 2, color, this)
+                                          std::make_shared<Block>(7, 0, color, this),
+            std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
+                                          std::make_shared<Block>(7, 2, color, this)
         },
     },
     {
         {
-            new Block(5, 1, color, this), new Block(6, 1, color, this), new Block(7, 1, color, this),
-                                          new Block(6, 2, color, this)
+            std::make_shared<Block>(5, 1, color, this), std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
+                                          std::make_shared<Block>(6, 2, color, this)
         }
     },
     {
         {
-            new Block(6, 0, color, this),
-            new Block(6, 1, color, this), new Block(7, 1, color, this),
-            new Block(6, 2, color, this)
+            std::make_shared<Block>(6, 0, color, this),
+            std::make_shared<Block>(6, 1, color, this), std::make_shared<Block>(7, 1, color, this),
+            std::make_shared<Block>(6, 2, color, this)
         },
     }
 };

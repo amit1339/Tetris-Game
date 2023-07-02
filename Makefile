@@ -1,6 +1,6 @@
 INCLUDE = -I./
 
-SRCS = PiecesFactory.cpp Pieces.cpp Tetris.cpp
+SRCS = PiecesFactory.cpp Pieces.cpp Tetris.cpp home_screan.cpp
 GAME_MAIN = Test.cpp
 
 NAME = Tetris_Game

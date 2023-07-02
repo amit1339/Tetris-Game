@@ -9,7 +9,7 @@
 class Tetris
 {
 public:
-    Tetris(sf::RenderWindow *window);
+    Tetris(sf::RenderWindow *window, std::string playerName);
     bool CanMove(const std::shared_ptr<Pieces>& piece, Direction direection);
     void AddScore();
     void DeleteRow(int col);
@@ -24,6 +24,7 @@ private:
     std::list<std::shared_ptr<Pieces>> m_dropped;
     BOARD m_board;
     bool m_isRunning;
+    std::string m_playerName;
 };
 
 

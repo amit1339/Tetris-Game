@@ -20,7 +20,7 @@ const size_t NumOfShapes = 4;
 
 class Block;
 class Pieces;
-typedef Block* BOARD[ROW_SIZE][COL_SIZE];
+typedef std::shared_ptr<Block> BOARD[ROW_SIZE][COL_SIZE];
 
 class Block
 {
@@ -29,6 +29,7 @@ public:
     void Render(sf::RenderWindow& window);
     void SetPosition(int x, int y);
     std::pair<int,int> GetPosition();
+    void SetColor(sf::Color color);
     std::shared_ptr<Pieces> GetPiece();
 private:
     const int m_blocksize;
@@ -45,16 +46,17 @@ public:
     virtual ~Pieces();
     void Move(Direction direction, BOARD& board);
     void SetPosition(int x, int y);
+    void RemoveBlock(std::shared_ptr<Block> &block);
     sf::Color GetColor() const;
     size_t GetCurrentState() const;
     void Render(sf::RenderWindow &window);
-    void SetShape(std::vector<std::vector<Block*>> state);
-    std::vector<Block *> GetBlocks();
+    void SetShape(std::vector<std::vector<std::shared_ptr<Block>>> state);
+    std::vector<std::shared_ptr<Block>> GetBlocks();
     void FreeAllStates();
 
 private:
     sf::Color m_color;
-    std::vector<std::vector<Block*>> m_shapes_vector;
+    std::vector<std::vector<std::shared_ptr<Block>>> m_shapes_vector;
     size_t m_current_state;
     int m_matrix_size;
 };

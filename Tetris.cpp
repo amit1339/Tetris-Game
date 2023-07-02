@@ -11,7 +11,7 @@ int RandomNum()
     return distribution(generator);
 }
 
-Tetris::Tetris(sf::RenderWindow *window):m_window(window), m_score(0), m_isRunning(true)
+Tetris::Tetris(sf::RenderWindow *window, std::string playerName):m_window(window), m_score(0), m_isRunning(true), m_playerName(playerName)
 {
     for (int i = 0; i < ROW_SIZE; i++)
     {
@@ -37,7 +37,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direction)
             {
                 return false;
             }
-            Block* other = m_board[position.first][position.second + 1];
+            std::shared_ptr<Block> other = m_board[position.first][position.second + 1];
             if (other && other->GetPiece() != block->GetPiece())
             {
                 if (!CanMove(other->GetPiece(), DOWN))
@@ -57,7 +57,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direction)
                 return false;
             }
 
-            Block* other = m_board[position.first + 1][position.second];
+            std::shared_ptr<Block> other = m_board[position.first + 1][position.second];
             if (other && other->GetPiece() != block->GetPiece())
             {
                 return false;
@@ -74,7 +74,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direction)
                 return false;
             }
 
-            Block* other = m_board[position.first - 1][position.second];
+            std::shared_ptr<Block> other = m_board[position.first - 1][position.second];
             if (other && other->GetPiece() != block->GetPiece())
             {
                 return false;
@@ -94,7 +94,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direction)
                 return false;
             }
 
-            Block* other = m_board[position.first][position.second];
+            std::shared_ptr<Block> other = m_board[position.first][position.second];
             if (other && other->GetPiece() != block->GetPiece())
             {
                 piece->m_current_state = old_state;
@@ -115,7 +115,7 @@ bool Tetris::CanMove(const std::shared_ptr<Pieces>& piece, Direction direction)
                 return false;
             }
 
-            Block* other = m_board[position.first][position.second];
+            std::shared_ptr<Block> other = m_board[position.first][position.second];
             if (other && other->GetPiece() != block->GetPiece())
             {
                 piece->m_current_state = old_state;
@@ -133,19 +133,45 @@ void Tetris::DeleteRow(int col)
 {
     for (int row = 0; row < ROW_SIZE; row++)
     {
-        //delete m_board[row][col];
-        m_board[row][col] = nullptr;
+        for (auto piece = m_dropped.begin(); piece != m_dropped.end(); piece++)
+        {
+            (*piece)->RemoveBlock(m_board[row][col]);
+            if ((*piece)->GetBlocks().empty())
+            {
+                m_dropped.erase(piece);
+                break;  // Break out of the loop after erasing the element
+            }
+        }
     }
-    
+
     for (int c = col; c > 0; c--)
     {
         for (int row = 0; row < ROW_SIZE; row++)
         {
+            auto temp = m_board[row][c];
             m_board[row][c] = m_board[row][c - 1];
-            m_board[row][c - 1] = nullptr;
+            m_board[row][c - 1] = temp;
+
+            if (m_board[row][c] != nullptr)
+            {
+                m_board[row][c]->SetPosition(0, 1);
+            }
+            if (m_board[row][c - 1] != nullptr)
+            {
+                m_board[row][c - 1]->SetPosition(0, -1);
+                if (m_board[row][c - 1]->GetPosition().second == 0)
+                {
+                    m_board[row][c - 1]->GetPiece()->RemoveBlock(m_board[row][c - 1]);
+                    m_board[row][c - 1] = nullptr;
+                }
+            }
         }
     }
 }
+
+
+
+
 
 
 void Tetris::AddScore()
@@ -166,8 +192,10 @@ void Tetris::AddScore()
         if (isRowFilled)
         {
             ++num_of_filled_rows;
-            if (col >= 0 && col < COL_SIZE)  // Check if col is within valid range
+            if (col >= 0 && col < COL_SIZE)
+            {
                 DeleteRow(col);
+            }  // Check if col is within valid range
         }
     }
 
@@ -193,7 +221,7 @@ void Tetris::AddScore()
 
 void Tetris::Run()
 {
-    std::shared_ptr<Pieces> piece = m_factory.Create(RandomNum());
+    std::shared_ptr<Pieces> piece = m_factory.Create(4);
     float dropTime = 0.0f;
     float dropInterval = 1.0f; // Drop interval in seconds */
 
@@ -272,7 +300,7 @@ void Tetris::Run()
                 AddScore();
                 std::cout << m_score << std::endl;
                 // Create a new piece
-                piece = m_factory.Create(RandomNum());
+                piece = m_factory.Create(4);
             }
         }
 
